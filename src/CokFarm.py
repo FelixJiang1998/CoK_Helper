@@ -10,9 +10,12 @@ from airtest.core.android.android import Android
 import cv2
 from PIL import Image
 import logging
+import typing
 
 logger = logging.getLogger("airtest")
 logger.setLevel(logging.INFO)
+
+resource = ['木', "粮", "铁", "银"]
 
 
 class CokFarm(object):
@@ -30,6 +33,7 @@ class CokFarm(object):
         assert self.device is not None
         self.app_name = target_app_name
         self.param = self.device.display_info
+        self.param["center"] = (self.param["max_x"] // 2, self.param["max_y"] // 2)
         self.target_resrc = target_resrc
 
     def collect_resource(self, target_march_size=6):
@@ -52,7 +56,7 @@ class CokFarm(object):
 
             # 队列未满
 
-            if loop_cnt > 7:
+            if loop_cnt > 8:
                 logger.error("收集资源任务部署完成")
                 break
 
@@ -119,6 +123,8 @@ class CokFarm(object):
                 Template(r"../images/出征界面检测.png", record_pos=(-0.001, -0.903), resolution=(1080, 2248)))
             if not pos:
                 logger.error("未进入出征")
+                # 猜测没田了 todo
+                self.target_resrc = "铁" if self.target_resrc == "银" else "银"
                 continue
 
             # 选择兵种优先级 -> 速度优先 todo 目前与分辨率绑定，待优化
@@ -202,7 +208,8 @@ class CokFarm(object):
             else:
                 # 点击找到的资源 - 在屏幕中心点
                 touch((self.param["max_x"] // 2, self.param["max_y"] // 2))
-                sleep(1)
+                pos = exists(Template(r"../images/野怪_攻击.png", resolution=(1080, 2248)))
+                touch(pos)
 
             # 检测出征
             pos = exists(
@@ -253,8 +260,8 @@ class CokFarm(object):
         """
         切换view, 默认回主城
         """
-        if "cur_view" not in self.param:
-            self.get_cur_view()
+        # if "cur_view" not in self.param:
+        self.get_cur_view()
         while self.param["cur_view"] != target_view:
 
             if self.param["cur_view"] == 2:
@@ -324,6 +331,34 @@ class CokFarm(object):
 
         logger.error("{}任务完成".format(self.app_name))
         stop_app(self.app_name)
+
+    def kill_griffin(self, total_num=3):
+        if self.app_name not in self.device.get_top_activity_name():
+            self.launch_app()
+
+        i = 0
+        while i < total_num:
+            self.toggle_view(1)
+            # 搜索
+            touch((70, 1703))
+            sleep(0.5)
+            touch((270, 1730))
+            sleep(0.3)
+            touch((600, 2090))  # 查找button
+            sleep(0.7)
+            touch(self.param["center"])
+            sleep(1)
+            touch((520, 1575))
+            sleep(0.7)
+
+            touch((350, 1108))
+            sleep(0.5)
+            touch((850, 2150))
+            sleep(0.7)
+            keyevent("4")
+            i += 1
+            if i and i % 4 == 0:
+                sleep(60)
 
 
 if __name__ == '__main__':
