@@ -22,4 +22,5 @@ cok_gp = CokFarm("com.hcg.cok.gp",
                  # target_resrc="铁",
                  device_=device)
 
-cok_gp.kill_griffin(9)
+cok_gp.kill_monster(20)
+# cok_gp.kill_griffin(20)

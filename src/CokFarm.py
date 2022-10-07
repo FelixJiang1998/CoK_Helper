@@ -50,13 +50,13 @@ class CokFarm(object):
         loop_cnt = 0
 
         is_march_list_expanded = False
-
+        march_size = 0
         while True:
             loop_cnt += 1
 
             # 队列未满
 
-            if loop_cnt > 8:
+            if loop_cnt > 7:
                 logger.error("收集资源任务部署完成")
                 break
 
@@ -64,24 +64,25 @@ class CokFarm(object):
 
             self.get_cur_view()
             self.toggle_view(1)
-            march_size = 0
+
             # 展开队列
             if not is_march_list_expanded:
                 pos = exists(
                     Template(r"../images/队列识别.png", threshold=0.8, record_pos=(-0.384, -0.569),
                              resolution=(1080, 2248)))
                 if pos:
-                    logger.info("展开队列显示")
-                    is_march_list_expanded = True
+                    logger.debug("展开队列显示")
                     touch(pos)
+
+                is_march_list_expanded = True
             else:
                 # 更新队列数量
                 march_list = find_all(
-                    Template(r"../images/队列状态_返回.png", rgb=False, threshold=0.7, record_pos=(-0.135, -0.462),
+                    Template(r"../images/队列状态_返回.png", rgb=True, threshold=0.7, record_pos=(-0.135, -0.462),
                              resolution=(1080, 2248)))
                 march_size = len(march_list) if march_list else 0
                 march_list = find_all(
-                    Template(r"../images/队列状态_加速.png", rgb=False, threshold=0.8, record_pos=(-0.135, -0.462),
+                    Template(r"../images/队列状态_加速.png", rgb=True, threshold=0.7, record_pos=(-0.135, -0.462),
                              resolution=(1080, 2248)))
                 march_size += len(march_list) if march_list else 0
 
@@ -92,7 +93,7 @@ class CokFarm(object):
             # 开始搜索
             touch((70, 1703))
             sleep(1)
-            # 现在默认采集秘银
+
             swipe(v1=(980, 1750), v2=(500, 1750))
             sleep(1)
             #             exists(Template(r"tpl1663827084320.png", record_pos=(-0.059, 0.564), resolution=(1080, 2248)))
@@ -123,7 +124,8 @@ class CokFarm(object):
                 Template(r"../images/出征界面检测.png", record_pos=(-0.001, -0.903), resolution=(1080, 2248)))
             if not pos:
                 logger.error("未进入出征")
-                # 猜测没田了 todo
+                # if march_size < target_march_size:
+                    # 猜测没田了 todo
                 self.target_resrc = "铁" if self.target_resrc == "银" else "银"
                 continue
 
@@ -227,7 +229,7 @@ class CokFarm(object):
             cnt += 1
             if cnt >= total:
                 break
-            if cnt and cnt % 3 == 0:  # 每3队休息15s
+            if cnt and cnt % 6 == 0:  # 每3队休息15s
                 logger.info("进度{}/{}".format(cnt, total))
                 sleep(15)
 
@@ -256,6 +258,8 @@ class CokFarm(object):
             return None
 
     def toggle_view(self, target_view=0):
+        if self.app_name not in self.device.get_top_activity_name():
+            self.launch_app()
         logger.info("开始切换视图，目标为：{}".format(target_view))
         """
         切换view, 默认回主城
@@ -330,21 +334,22 @@ class CokFarm(object):
             self.collect_resource(collect_number)
 
         logger.error("{}任务完成".format(self.app_name))
-        stop_app(self.app_name)
+        # stop_app(self.app_name)
+        home();
 
-    def kill_griffin(self, total_num=3):
+    def kill_griffin(self, total=3):
         if self.app_name not in self.device.get_top_activity_name():
             self.launch_app()
 
         i = 0
-        while i < total_num:
+        while i < total:
             self.toggle_view(1)
             # 搜索
             touch((70, 1703))
-            sleep(0.5)
+            sleep(1)
             touch((270, 1730))
             sleep(0.3)
-            touch((600, 2090))  # 查找button
+            touch((600, 2090))  # 确认查找button
             sleep(0.7)
             touch(self.param["center"])
             sleep(1)
@@ -356,9 +361,10 @@ class CokFarm(object):
             touch((850, 2150))
             sleep(0.7)
             keyevent("4")
+            if i and i % 6 == 0:
+                logger.error("当前进度{}/{}".format(i, total))
+                sleep(2*60)
             i += 1
-            if i and i % 4 == 0:
-                sleep(60)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 # -*- encoding=utf8 -*-
 __author__ = "FelixJ"
 
+import logging
 # import logging
 import sys
 
@@ -20,7 +21,9 @@ print("start...")
 device: Android = connect_device(uri)
 logger.info(device.display_info)
 
-cok_9u = CokFarm("com.hcg.cok.uc", device_=device)
+cok_9u = CokFarm("com.hcg.cok.uc",
+                 target_resrc="铁",
+                 device_=device)
 cok_gp = CokFarm("com.hcg.cok.gp",
                  # target_resrc="铁",
                  device_=device)
@@ -28,14 +31,15 @@ cok_gp = CokFarm("com.hcg.cok.gp",
 while True:
     # sleep(1.5 * 60 * 60)
     try:
-        cok_9u.kill_monster(5)
+        # cok_9u.kill_monster(5)
         # sleep(60)
         cok_9u.run()
-        cok_gp.kill_monster(10)
-        # sleep(60)
-        cok_gp.run(is_prod=False, collect_number=5)
-        # cok_gp.run()
-    except  Exception:
+        # cok_gp.kill_monster(10)
+        # # sleep(60)
+        # cok_gp.run(is_prod=False, collect_number=5)
+        cok_gp.run()
+    except  Exception as e:
+        logger.error(e)
         pass
     finally:
         sleep(30 * 60)
