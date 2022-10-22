@@ -125,7 +125,7 @@ class CokFarm(object):
             if not pos:
                 logger.error("未进入出征")
                 # if march_size < target_march_size:
-                    # 猜测没田了 todo
+                # 猜测没田了 todo
                 self.target_resrc = "铁" if self.target_resrc == "银" else "银"
                 continue
 
@@ -189,6 +189,14 @@ class CokFarm(object):
             if self.app_name not in self.device.get_top_activity_name():
                 self.launch_app()
 
+            if cnt >= total:
+                break
+            # if cnt and cnt % 10 == 0:
+            #     self.get_energy()
+            if cnt and cnt % 6 == 0:  # 每6队休息15s
+                logger.info("进度{}/{}".format(cnt, total))
+                sleep(15)
+
             self.toggle_view(1)
 
             # 寻找野怪
@@ -227,11 +235,7 @@ class CokFarm(object):
             touch((900, 2100))
 
             cnt += 1
-            if cnt >= total:
-                break
-            if cnt and cnt % 6 == 0:  # 每3队休息15s
-                logger.info("进度{}/{}".format(cnt, total))
-                sleep(15)
+
 
     def get_cur_view(self):
         """先检测app装态检测当前view"""
@@ -348,7 +352,7 @@ class CokFarm(object):
             touch((70, 1703))
             sleep(1)
             touch((270, 1730))
-            sleep(0.3)
+            sleep(0.5)
             touch((600, 2090))  # 确认查找button
             sleep(0.7)
             touch(self.param["center"])
@@ -361,10 +365,29 @@ class CokFarm(object):
             touch((850, 2150))
             sleep(0.7)
             keyevent("4")
-            if i and i % 6 == 0:
-                logger.error("当前进度{}/{}".format(i, total))
-                sleep(2*60)
+
             i += 1
+            if i and i % 6 == 0:
+                self.get_energy()
+            if i and i % 3 == 0:
+                logger.error("当前进度{}/{}".format(i, total))
+                sleep(2 * 60)
+
+
+    def get_energy(self, value=10):
+        touch((80, 150))  # 头像
+        sleep(0.5)
+        touch((950, 1200))  # 体力
+        sleep(0.5)
+        touch((850, 610))  # 使用10
+        sleep(0.5)
+        touch((745, 1200))
+        sleep(0.5)
+        logger.info("补充体力110点")
+        text("0")
+        sleep(0.5)
+        touch((750, 1350))
+        sleep(0.5)
 
 
 if __name__ == '__main__':
@@ -379,9 +402,15 @@ if __name__ == '__main__':
                    project_root="C:/CODE/Airtest")
         simple_report(__file__, logpath=True)
     #         connect_device(nox_uri)
+    device = device()
+    cok_9u = CokFarm("com.hcg.cok.uc",
+                     target_resrc="铁",
+                     device_=device)
+    cok_cn = CokFarm("com.hcg.cok.cn1",  # 国服
+                     target_resrc="银",
+                     device_=device)
+    logger.info(cok_9u.device.display_info)
+    cok_9u.run()
+    cok_cn.run()
 
-    cok = CokFarm("com.hcg.cok.uc")
-    logger.info(cok.device.display_info)
-    cok.run()
-
-    cok.device.keyevent("26")
+    # cok.device.keyevent("26")

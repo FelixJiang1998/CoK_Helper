@@ -118,3 +118,7 @@ def gen(arr, i):
 
 # inpu = [2, 3, 5, 8, 13, 21, 34]
 # reverseOddLevels(gen(inpu, 0))
+
+
+l = []
+l.sort(reverse=True)
