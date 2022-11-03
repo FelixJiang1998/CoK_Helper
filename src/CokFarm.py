@@ -43,7 +43,7 @@ class CokFarm(object):
             1. 切换到世界
             2. 检测剩余队列
         """
-        logger.info("当前任务：采集")
+        logger.error("当前任务：采集")
         self.toggle_view(target_view=1)
         # 放大视图
         self.zoom_in()
@@ -87,7 +87,7 @@ class CokFarm(object):
                 march_size += len(march_list) if march_list else 0
 
             if march_size and march_size >= target_march_size:
-                logger.info("当前队列数量已满:{}".format(march_size))
+                logger.error("当前队列数量已满:{}".format(march_size))
                 break
 
             # 开始搜索
@@ -126,7 +126,7 @@ class CokFarm(object):
                 logger.error("未进入出征")
                 # if march_size < target_march_size:
                 # 猜测没田了 todo
-                self.target_resrc = "铁" if self.target_resrc == "银" else "银"
+                # self.target_resrc = "铁" if self.target_resrc == "银" else "银"
                 continue
 
             # 选择兵种优先级 -> 速度优先 todo 目前与分辨率绑定，待优化
@@ -136,15 +136,18 @@ class CokFarm(object):
             touch((900, 2100))
             march_size += 1
 
-            logger.info("当前队列数：{}".format(march_size))
+            logger.error("当前队列数：{}".format(march_size))
             if march_size >= target_march_size:
                 break
 
     def collect_production(self):
-        logger.info("收集自产开始")
+        error_cnt = 0
+        logger.error("收集自产开始")
         self.toggle_view(0)
         assert self.param["cur_view"] == 0
-        while True:
+        while error_cnt < 5:
+            error_cnt += 1
+
             if self.app_name not in self.device.get_top_activity_name():
                 self.launch_app()
 
@@ -161,6 +164,10 @@ class CokFarm(object):
                     touch(pos)
                 else:
                     logger.error("未找到按钮")
+
+                    if error_cnt > 3:
+                        stop_app(self.app_name)
+                        error_cnt = 0
                     self.toggle_view(0)
                     continue
             logger.info("猜测按钮已经展开")
@@ -179,7 +186,7 @@ class CokFarm(object):
         sleep(15)
         self.os_return()
         self.os_return()
-        logger.info("收集自产结束")
+        logger.error("收集自产结束")
 
     def kill_monster(self, total=10):
 
@@ -191,10 +198,10 @@ class CokFarm(object):
 
             if cnt >= total:
                 break
-            # if cnt and cnt % 10 == 0:
-            #     self.get_energy()
+            if cnt > 10 and cnt % 10 == 0:
+                self.get_energy()
             if cnt and cnt % 6 == 0:  # 每6队休息15s
-                logger.info("进度{}/{}".format(cnt, total))
+                logger.error("进度{}/{}".format(cnt, total))
                 sleep(15)
 
             self.toggle_view(1)
@@ -219,7 +226,10 @@ class CokFarm(object):
                 # 点击找到的资源 - 在屏幕中心点
                 touch((self.param["max_x"] // 2, self.param["max_y"] // 2))
                 pos = exists(Template(r"../images/野怪_攻击.png", resolution=(1080, 2248)))
-                touch(pos)
+                if pos:
+                    touch(pos)
+                else:
+                    continue
 
             # 检测出征
             pos = exists(
@@ -236,14 +246,13 @@ class CokFarm(object):
 
             cnt += 1
 
-
     def get_cur_view(self):
         """先检测app装态检测当前view"""
         if self.app_name not in self.device.get_top_activity_name():
             logger.error("app已退出")
             self.launch_app()
 
-        logger.info("检测当前view")
+        logger.error("检测当前view")
 
         if exists(Template(r"../images/mini_城内.png", threshold=0.7, rgb=True, record_pos=(-0.398, 0.935),
                            resolution=(1080, 2248))):
@@ -264,7 +273,7 @@ class CokFarm(object):
     def toggle_view(self, target_view=0):
         if self.app_name not in self.device.get_top_activity_name():
             self.launch_app()
-        logger.info("开始切换视图，目标为：{}".format(target_view))
+        logger.error("开始切换视图，目标为：{}".format(target_view))
         """
         切换view, 默认回主城
         """
@@ -297,12 +306,12 @@ class CokFarm(object):
             sleep(5)
             attemp_times += 1
 
-            if attemp_times > 4:
+            if attemp_times > 5:
                 if self.app_name in self.device.get_top_activity_name():
                     return
                 else:
                     logger.error("启动失败")
-                    exit()
+                    self.launch_app()
 
     def zoom_in(self):
         pinch(
@@ -339,7 +348,7 @@ class CokFarm(object):
 
         logger.error("{}任务完成".format(self.app_name))
         # stop_app(self.app_name)
-        home();
+        # home()
 
     def kill_griffin(self, total=3):
         if self.app_name not in self.device.get_top_activity_name():
@@ -373,7 +382,6 @@ class CokFarm(object):
                 logger.error("当前进度{}/{}".format(i, total))
                 sleep(2 * 60)
 
-
     def get_energy(self, value=10):
         touch((80, 150))  # 头像
         sleep(0.5)
@@ -383,11 +391,13 @@ class CokFarm(object):
         sleep(0.5)
         touch((745, 1200))
         sleep(0.5)
-        logger.info("补充体力110点")
+        logger.error("补充体力100点")
         text("0")
         sleep(0.5)
         touch((750, 1350))
         sleep(0.5)
+        self.app_return()
+        self.app_return()
 
 
 if __name__ == '__main__':

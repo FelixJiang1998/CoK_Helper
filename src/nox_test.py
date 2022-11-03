@@ -10,7 +10,7 @@ sys.path.append("./images/")
 from CokFarm import *
 
 logger = logging.getLogger("airtest")
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.ERROR)
 
 if not cli_setup():
     uri = "android://127.0.0.1:5037/127.0.0.1:62001?cap_method=&&ori_method=MINICAPORI&&touch_method=MINITOUCH"
@@ -38,8 +38,8 @@ while True:
         cok_9u.run()
         # cok_gp.kill_monster(10)
         # # sleep(60)
-        cok_gp.run(is_prod=False, collect_number=5)
-        # cok_gp.run(collect_number=5)
+        # cok_gp.run(is_prod=False, collect_number=5)
+        cok_gp.run(collect_number=5)
         # cok_gp.run()
     except Exception as e:
         logger.error(e)
@@ -49,4 +49,5 @@ while True:
 # generate html report
 # from airtest.report.report import simple_report
 # simple_report(__file__, logpath=True)
-# print(cok_gp.device.get_top_activity_name())
+# print(cok_gp.device.
+# get_top_activity_name())
