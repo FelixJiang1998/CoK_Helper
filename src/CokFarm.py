@@ -266,7 +266,11 @@ class CokFarm(object):
             return 1
         else:
             logger.error("检测不到所处界面")
-            assert self.app_name in self.device.get_top_activity_name()
+            if self.app_name not in self.device.get_top_activity_name():
+                self.launch_app()
+            else:
+                logger.error("Unknown error")
+                # stop_app(self.app_name)
             self.param["cur_view"] = 2
             return None
 
@@ -306,7 +310,7 @@ class CokFarm(object):
             sleep(5)
             attemp_times += 1
 
-            if attemp_times > 5:
+            if attemp_times > 2:
                 if self.app_name in self.device.get_top_activity_name():
                     return
                 else:
@@ -348,7 +352,7 @@ class CokFarm(object):
 
         logger.error("{}任务完成".format(self.app_name))
         # stop_app(self.app_name)
-        # home()
+        home()
 
     def kill_griffin(self, total=3):
         if self.app_name not in self.device.get_top_activity_name():
