@@ -16,7 +16,7 @@ if not cli_setup():
     uri = "android://127.0.0.1:5037/127.0.0.1:62001?cap_method=&&ori_method=MINICAPORI&&touch_method=MINITOUCH"
     # uri = "android://127.0.0.1:5037/208602d4?cap_method=MINICAP&&ori_method=MINICAPORI&&touch_method=MAXTOUCH"
 
-    auto_setup(__file__, logdir=False, devices=[uri], project_root="C:/CODE/Airtest")
+    auto_setup(__file__, logdir=False, devices=[uri,], project_root="C:/CODE/Airtest")
 
 # script content
 print("start...")
@@ -24,7 +24,7 @@ device: Android = connect_device(uri)
 logger.info(device.display_info)
 
 cok_9u = CokFarm("com.hcg.cok.uc",
-                #  target_resrc="铁",
+                 target_resrc="铁",
                  device_=device)
 cok_gp = CokFarm("com.hcg.cok.gp",
                  # target_resrc="铁",
@@ -38,8 +38,9 @@ while True:
         # cok_gp.kill_monster(10)
         # # sleep(60)
         # cok_gp.run(is_prod=False, collect_number=5)
-        # cok_gp.run(collect_number=5)
+        cok_gp.run(collect_number=5)
         # cok_gp.run()
+    
     except Exception as e:
         logger.error(e)
     finally:
