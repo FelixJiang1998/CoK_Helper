@@ -267,6 +267,7 @@ class CokFarm(object):
         else:
             logger.error("检测不到所处界面")
             if self.app_name not in self.device.get_top_activity_name():
+                home()
                 self.launch_app()
             else:
                 logger.error("Unknown error")
@@ -351,7 +352,7 @@ class CokFarm(object):
             self.collect_resource(collect_number)
 
         logger.error("{}任务完成".format(self.app_name))
-        stop_app(self.app_name)
+        # stop_app(self.app_name)
         home()
 
     def kill_griffin(self, total=3):
