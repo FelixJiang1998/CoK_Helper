@@ -316,6 +316,7 @@ class CokFarm(object):
                     return
                 else:
                     logger.error("启动失败")
+                    stop_app(self.app_name)
                     self.launch_app()
 
     def zoom_in(self):
@@ -339,10 +340,14 @@ class CokFarm(object):
         # if pos:
         #     touch(pos)
 
-    def run(self, is_prod=True, collect_number=6):
+    def run(self, is_prod=True, collect_number=6, monster=0):
         wake()
         #     cok.device.unlock()
         self.launch_app()
+
+        # 打野怪
+        if monster:
+            self.kill_monster(monster)
 
         # 收集自产
         if is_prod:
@@ -350,6 +355,7 @@ class CokFarm(object):
         # 采集
         if collect_number:
             self.collect_resource(collect_number)
+        
 
         logger.error("{}任务完成".format(self.app_name))
         # stop_app(self.app_name)

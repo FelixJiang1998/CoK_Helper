@@ -2,7 +2,6 @@
 __author__ = "FelixJ"
 
 import logging
-# import logging
 import sys
 
 sys.path.append("./src/")
@@ -21,26 +20,34 @@ if not cli_setup():
 # script content
 print("start...")
 device: Android = connect_device(uri)
+
 logger.info(device.display_info)
 
 cok_9u = CokFarm("com.hcg.cok.uc",
-                 target_resrc="铁",
+                #  target_resrc="铁",
                  device_=device)
 cok_gp = CokFarm("com.hcg.cok.gp",
                  # target_resrc="铁",
                  device_=device)
-
+cnt = 0 
 while True:
     try:
+        cnt += 1
         # cok_9u.kill_monster(5),
         # sleep(60)
+        logger.info("第{}次执行开始".format(cnt))
         cok_9u.run()
-        # cok_gp.kill_monster(10)
+        
         # # sleep(60)
         # cok_gp.run(is_prod=False, collect_number=5)
-        cok_gp.run(collect_number=5)
-        # cok_gp.run()
-    
+        # cok_gp.run(collect_number=4)
+        cok_gp.run(monster=10)
+
+        # stop the app for stability after 5 times
+        if cnt % 5 == 0: 
+            stop_app(cok_9u.app_name)
+            stop_app(cok_gp.app_name)
+        logger.info("第{}次执行结束".format(cnt))
     except Exception as e:
         logger.error(e)
     finally:
