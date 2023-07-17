@@ -91,7 +91,7 @@ class CokFarm(object):
                 break
 
             # 开始搜索
-            touch((70, 1703))
+            touch((75, 1715))
             sleep(1)
 
             swipe(v1=(980, 1750), v2=(500, 1750))

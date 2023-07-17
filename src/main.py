@@ -26,7 +26,7 @@ logger.info(device.display_info)
 cok_9u = CokFarm("com.hcg.cok.uc",
                 #  target_resrc="铁",
                  device_=device)
-cok_gp = CokFarm("com.hcg.cok.gp",
+cok_gp = CokFarm("com.hcg.cok.cn1",
                  # target_resrc="铁",
                  device_=device)
 cnt = 0 
@@ -41,17 +41,19 @@ while True:
         # # sleep(60)
         # cok_gp.run(is_prod=False, collect_number=5)
         # cok_gp.run(collect_number=4)
-        cok_gp.run(monster=5)
-        # cok_gp.run()
+        cok_gp.run()
+        
 
         # stop the app for stability after 5 times
         if cnt % 5 == 0: 
             stop_app(cok_9u.app_name)
+            # cok_gp.run()
             stop_app(cok_gp.app_name)
         logger.info("第{}次执行结束".format(cnt))
     except Exception as e:
         logger.error(e)
     finally:
+
         sleep(30 * 60)
 
 # generate html report

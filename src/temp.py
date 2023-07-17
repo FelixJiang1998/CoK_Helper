@@ -35,3 +35,5 @@ while True:
         logger.error(e)
 
 
+
+touch(Template(r"tpl1689630190685.png", record_pos=(-0.433, 0.537), resolution=(1080, 2248)))
